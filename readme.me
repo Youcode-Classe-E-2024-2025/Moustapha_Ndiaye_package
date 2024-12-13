@@ -1,0 +1,132 @@
+# Package manage system
+
+------------------------ technologies ----------------------------
+html, css, php, mysql
+
+------------------------ data base creation -----------------------
+TABLE Authors {
+  id integer [primary key]
+  name varchar
+  email varchar
+}
+
+TABLE Packages {
+  id integer [primary key]
+  name varchar
+  description varchar
+  created_at timestamp
+  author_id integer [ref: > Authors.id]
+}
+
+TABLE Versions {
+  id integer [primary key]
+  package_id integer [ref: > Packages.id]
+  num_version varchar
+  release_date timestamp
+}
+
+TABLE Tags {
+  id integer [primary key]
+  name varchar
+}
+
+TABLE Package_Tags {
+  package_id integer [ref: > Packages.id]
+  tag_id integer [ref: > Tags.id]
+  primary key (package_id, tag_id)
+}
+
+TABLE Dependencies {
+  package_id integer [ref: > Packages.id]
+  depends_on_package_id integer [ref: > Packages.id]
+  primary key (package_id, depends_on_package_id)
+}
+------------------------  Scripts SQ -----------------------
+
+CREATE DATABASE IF NOT EXISTS PackageManagement;
+USE PackageManagement;
+
+CREATE TABLE IF NOT EXISTS Authors (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS Packages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    author_id INT,
+    FOREIGN KEY (author_id) REFERENCES Authors(id) ON DELETE SET NULL,
+    UNIQUE (name, author_id)
+);
+
+CREATE TABLE IF NOT EXISTS Versions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    package_id INT,
+    num_version VARCHAR(50) NOT NULL,
+    release_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (package_id) REFERENCES Packages(id) ON DELETE CASCADE,
+    UNIQUE (package_id, num_version)
+);
+
+CREATE TABLE IF NOT EXISTS Tags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Packages_Tags (
+    package_id INT,
+    tag_id INT,
+    PRIMARY KEY (package_id, tag_id),
+    FOREIGN KEY (package_id) REFERENCES Packages(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES Tags(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Dependencies (
+    package_id INT,
+    depends_on_package_id INT,
+    PRIMARY KEY (package_id, depends_on_package_id),
+    FOREIGN KEY (package_id) REFERENCES Packages(id) ON DELETE CASCADE,
+    FOREIGN KEY (depends_on_package_id) REFERENCES Packages(id) ON DELETE CASCADE,
+    CHECK (package_id <> depends_on_package_id)
+);
+
+------------------------  Structure of project -----------------------
+/Moustapha_Ndiaye_package/
+├── /config/                                      
+│      └── db_connect.php        
+│              
+│
+├── /data/                   
+│   ├── PackageManagement.sql                                
+│
+├── /functions/                     
+│   ├── authors.php                
+│   ├── package.php                            
+│
+|
+├── /public/                     
+│   |── css 
+|   |    |__style.css
+|   |         
+│   |── js
+|       |script.js
+|  
+|
+|
+├── /views/                     
+│   |── add_package.php          
+│   |── add_versions.php
+│   |── all_packages.php
+│   |── detail_package.php
+│   ├── manage_authors.php       
+│   └── search.php            
+│
+├── /uploads/
+|   └── db_connect.php                    
+|
+├── /index.php/
+├── /readme.me/

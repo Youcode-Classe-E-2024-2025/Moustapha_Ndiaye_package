@@ -48,3 +48,6 @@ CREATE TABLE IF NOT EXISTS Dependencies (
     FOREIGN KEY (depends_on_package_id) REFERENCES Packages(id) ON DELETE CASCADE,
     CHECK (package_id <> depends_on_package_id)
 );
+
+
+
